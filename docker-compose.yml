@@ -1,0 +1,36 @@
+version: '3'
+services:
+  goal-app:
+    image: goal-app:1.0
+    container_name: goal-app-container
+    ports:
+      - 8080:8080
+    depends_on:
+      - goalapp-db
+    networks:
+      - goalapp-network
+
+  goalapp-db:
+    image: postgres
+    restart: always
+    container_name: goal-app-postgres-container
+    hostname: goalapp-db
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_DB=postgres
+    volumes:
+      - goalapp-db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - goalapp-network
+
+networks:
+  goalapp-network:
+    name: goalapp-network
+    driver: bridge
+
+volumes:
+  goalapp-db:
+    name: goalapp-db
