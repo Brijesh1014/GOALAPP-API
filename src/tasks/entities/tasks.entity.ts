@@ -1,33 +1,33 @@
-import dayjs from 'dayjs';
-import { GoalsEntity } from 'src/goals/entities/goals.entity';
-import { TaskStatus } from 'src/types/tasks/ITasks';
+import dayjs from "dayjs";
+import { GoalsEntity } from "../../goals/entities/goals.entity";
+import { TaskStatus } from "../../types/tasks/ITasks";
 import {
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-} from 'typeorm';
+} from "typeorm";
 
-@Entity({ name: 'tasks' })
+@Entity({ name: "tasks" })
 export class TasksEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ default: '' })
+  @Column({ default: "" })
   ref: string;
 
   @Column()
   name: string;
 
-  @Column({ default: '' })
+  @Column({ default: "" })
   description: string;
 
   @ManyToOne(() => GoalsEntity, (goal) => goal.id, {
     nullable: false,
-    onDelete: 'CASCADE',
+    onDelete: "CASCADE",
   })
-  @JoinColumn({ name: 'goal_id' })
+  @JoinColumn({ name: "goal_id" })
   goal: GoalsEntity;
 
   @Column()

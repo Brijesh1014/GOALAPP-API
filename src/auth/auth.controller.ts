@@ -1,21 +1,21 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { ILogin } from 'src/types/users/ILogin';
-import { CreateUser } from 'src/types/users/IUser';
+import { Body, Controller, Post } from "@nestjs/common";
+import { AuthService } from "./auth.service";
+import { ILogin } from "../types/users/ILogin";
+import { CreateUser } from "../types/users/IUser";
 
 @Controller({
-  path: 'auth',
-  version: '1',
+  path: "auth",
+  version: "1",
 })
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('/login')
+  @Post("/login")
   login(@Body() payload: ILogin) {
     return this.authService.login(payload);
   }
 
-  @Post('/signup')
+  @Post("/signup")
   signup(@Body() payload: CreateUser) {
     return this.authService.createAccount(payload);
   }

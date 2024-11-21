@@ -3,12 +3,12 @@ import {
   ForbiddenException,
   HttpStatus,
   Injectable,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UsersEntity } from './entities/users.entity';
-import { Repository } from 'typeorm';
-import { Request } from 'express';
-import { AwsS3Service } from 'src/common/aws/aws-s3.service';
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { UsersEntity } from "./entities/users.entity";
+import { Repository } from "typeorm";
+import { Request } from "express";
+import { AwsS3Service } from "../common/aws/aws-s3.service";
 
 @Injectable()
 export class UsersService {
@@ -16,7 +16,7 @@ export class UsersService {
     @InjectRepository(UsersEntity)
     private usersRepository: Repository<UsersEntity>,
 
-    private awsS3Service: AwsS3Service,
+    private awsS3Service: AwsS3Service
   ) {}
 
   async getUsers() {
@@ -36,11 +36,11 @@ export class UsersService {
 
     const activeUser = await this.usersRepository.findOne({ where: { id } });
     if (!activeUser) {
-      throw new ForbiddenException('UnAuthorized');
+      throw new ForbiddenException("UnAuthorized");
     }
 
     return {
-      message: 'Success',
+      message: "Success",
       error: null,
       statusCode: HttpStatus.OK,
       data: {
@@ -56,21 +56,21 @@ export class UsersService {
     const awsData = await this.awsS3Service.uploadFile(file);
 
     if (!awsData) {
-      throw new BadRequestException('AWS error');
+      throw new BadRequestException("AWS error");
     }
 
     await this.usersRepository.update(
       { id: activeUser.id },
       {
         photo: awsData.Location,
-      },
+      }
     );
 
     return {
-      message: 'User profile uploaded success',
+      message: "User profile uploaded success",
       error: null,
       statusCode: HttpStatus.OK,
-      data: 'OK',
+      data: "OK",
     };
   }
 }

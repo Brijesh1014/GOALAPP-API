@@ -3,14 +3,14 @@ import {
   HttpStatus,
   Injectable,
   NotFoundException,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { GoalsEntity } from './entities/goals.entity';
-import { Repository } from 'typeorm';
-import { CreateGoal, GoalStatus } from 'src/types/goals/IGoal';
-import dayjs from 'dayjs';
-import { Request } from 'express';
-import { TasksEntity } from 'src/tasks/entities/tasks.entity';
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { GoalsEntity } from "./entities/goals.entity";
+import { Repository } from "typeorm";
+import { CreateGoal, GoalStatus } from "../types/goals/IGoal";
+import dayjs from "dayjs";
+import { Request } from "express";
+import { TasksEntity } from "../tasks/entities/tasks.entity";
 
 @Injectable()
 export class GoalsService {
@@ -18,7 +18,7 @@ export class GoalsService {
     @InjectRepository(GoalsEntity)
     private goalsRepository: Repository<GoalsEntity>,
     @InjectRepository(TasksEntity)
-    private tasksRepository: Repository<TasksEntity>,
+    private tasksRepository: Repository<TasksEntity>
   ) {}
 
   async getGoalWithTasks(goalId: string) {
@@ -27,11 +27,11 @@ export class GoalsService {
       relations: { tasks: true },
     });
     if (!goal) {
-      throw new NotFoundException('Goal not found');
+      throw new NotFoundException("Goal not found");
     }
 
     return {
-      message: 'Success',
+      message: "Success",
       error: null,
       statusCode: HttpStatus.OK,
       data: goal,
@@ -41,13 +41,13 @@ export class GoalsService {
   async getTasksByGoalId(goalId: string, date?: string) {
     const goal = await this.goalsRepository.findOne({ where: { id: goalId } });
     if (!goal) {
-      throw new NotFoundException('Goal not found');
+      throw new NotFoundException("Goal not found");
     }
 
     if (dayjs(date).isBefore(goal.start_duration)) {
       throw new NotFoundException(
-        'Your goal will be started from ' +
-          dayjs(goal.start_duration).format('MMM DD'),
+        "Your goal will be started from " +
+          dayjs(goal.start_duration).format("MMM DD")
       );
     }
 
@@ -57,11 +57,11 @@ export class GoalsService {
 
     const tasks = await this.tasksRepository.find({
       where: { goal: { id: goalId }, created_at: date },
-      order: { name: 'DESC' },
+      order: { name: "DESC" },
     });
 
     return {
-      message: 'Success',
+      message: "Success",
       error: null,
       statusCode: HttpStatus.OK,
       data: {
@@ -77,18 +77,18 @@ export class GoalsService {
       payload;
 
     if (!name || !start_duration || !end_duration) {
-      throw new BadRequestException('Missing required properties');
+      throw new BadRequestException("Missing required properties");
     }
 
     if (!Array.isArray(tasks)) {
-      throw new BadRequestException('Missing required properties [tasks]');
+      throw new BadRequestException("Missing required properties [tasks]");
     }
 
     const isValidStartDuration = dayjs(start_duration).isValid();
     const isValidEndDuration = dayjs(end_duration).isValid();
 
     if (!isValidStartDuration || !isValidEndDuration) {
-      throw new BadRequestException('Invalid duration');
+      throw new BadRequestException("Invalid duration");
     }
 
     let goalStatus = GoalStatus.InActive;
@@ -120,7 +120,7 @@ export class GoalsService {
 
     const allTasks = [];
 
-    while (current.isBefore(endDate) || current.isSame(endDate, 'day')) {
+    while (current.isBefore(endDate) || current.isSame(endDate, "day")) {
       const taskPromise = await Promise.all(
         tasks.map(async (task, index) => {
           const { name, description } = task;
@@ -128,20 +128,20 @@ export class GoalsService {
             name,
             description,
             goal,
-            created_at: current.format('YYYY-MM-DD'),
+            created_at: current.format("YYYY-MM-DD"),
             // Useful to update tasks
             ref: index.toString(),
           });
           return await this.tasksRepository.save(taskObject);
-        }),
+        })
       );
 
       allTasks.push(...taskPromise);
-      current = current.add(1, 'day'); // Increment by 1 day
+      current = current.add(1, "day"); // Increment by 1 day
     }
 
     return {
-      message: 'Goal successfully added',
+      message: "Goal successfully added",
       statusCode: HttpStatus.CREATED,
       data: goal,
       error: null,
@@ -158,7 +158,7 @@ export class GoalsService {
     });
 
     return {
-      message: 'User goals',
+      message: "User goals",
       error: null,
       statusCode: HttpStatus.OK,
       data: userGoals,
@@ -168,9 +168,9 @@ export class GoalsService {
   async updateGoalTheme(id: string, theme: string) {
     const goal = await this.goalsRepository.findOne({ where: { id } });
     if (goal) {
-      await this.goalsRepository.update({ id }, { theme: '#' + theme });
+      await this.goalsRepository.update({ id }, { theme: "#" + theme });
       return {
-        message: 'Theme updated',
+        message: "Theme updated",
         error: null,
         statusCode: HttpStatus.OK,
         data: {
@@ -178,17 +178,17 @@ export class GoalsService {
         },
       };
     }
-    throw new NotFoundException('Goal not found');
+    throw new NotFoundException("Goal not found");
   }
 
   async deleteGoal(goalId: string) {
     await this.goalsRepository.delete({ id: goalId });
 
     return {
-      message: 'Your Goal has been deleted',
+      message: "Your Goal has been deleted",
       error: null,
       statusCode: HttpStatus.OK,
-      data: 'Delete',
+      data: "Delete",
     };
   }
 }

@@ -1,7 +1,7 @@
-import dayjs from 'dayjs';
-import { TasksEntity } from 'src/tasks/entities/tasks.entity';
-import { GoalStatus } from 'src/types/goals/IGoal';
-import { UsersEntity } from 'src/users/entities/users.entity';
+import dayjs from "dayjs";
+import { TasksEntity } from "../../tasks/entities/tasks.entity";
+import { GoalStatus } from "../../types/goals/IGoal";
+import { UsersEntity } from "../../users/entities/users.entity";
 import {
   Column,
   Entity,
@@ -9,21 +9,21 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-} from 'typeorm';
+} from "typeorm";
 
-@Entity({ name: 'goals' })
+@Entity({ name: "goals" })
 export class GoalsEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column()
   name: string;
 
-  @Column({ default: '' })
+  @Column({ default: "" })
   description: string;
 
   @ManyToOne(() => UsersEntity, (user) => user.id)
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: "user_id" })
   user: UsersEntity;
 
   @Column()
@@ -32,10 +32,10 @@ export class GoalsEntity {
   @Column({ default: GoalStatus.InActive })
   status: GoalStatus;
 
-  @Column({ default: '' })
+  @Column({ default: "" })
   start_duration: string;
 
-  @Column({ default: '' })
+  @Column({ default: "" })
   end_duration: string;
 
   @Column({ nullable: true })

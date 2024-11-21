@@ -3,16 +3,16 @@ import {
   HttpStatus,
   Injectable,
   NotFoundException,
-} from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
+} from "@nestjs/common";
+import * as bcrypt from "bcrypt";
 
-import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { ILogin } from 'src/types/users/ILogin';
-import { UsersEntity } from 'src/users/entities/users.entity';
-import { Repository } from 'typeorm';
-import { CreateUser } from 'src/types/users/IUser';
-import { ConfigService } from '@nestjs/config';
+import { JwtService } from "@nestjs/jwt";
+import { InjectRepository } from "@nestjs/typeorm";
+import { ILogin } from "../types/users/ILogin";
+import { UsersEntity } from "../users/entities/users.entity";
+import { Repository } from "typeorm";
+import { CreateUser } from "../types/users/IUser";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class AuthService {
@@ -20,18 +20,18 @@ export class AuthService {
     @InjectRepository(UsersEntity)
     private userRepository: Repository<UsersEntity>,
     private jwtService: JwtService,
-    private configService: ConfigService,
+    private configService: ConfigService
   ) {}
 
   async createAccount(payload: CreateUser) {
     const { display_name, email, password, user_name, photo } = payload;
     if (!email || !password || !user_name) {
-      throw new BadRequestException('Missing required properties');
+      throw new BadRequestException("Missing required properties");
     }
     const user = await this.userRepository.findOne({ where: { email } });
     if (user) {
       throw new BadRequestException(
-        `Account with email ${email} already using this app`,
+        `Account with email ${email} already using this app`
       );
     }
 
@@ -49,7 +49,7 @@ export class AuthService {
     const userData = await this.userRepository.save(userObject);
 
     return {
-      message: 'Account created success',
+      message: "Account created success",
       error: null,
       statusCode: HttpStatus.CREATED,
       data: userData,
@@ -60,7 +60,7 @@ export class AuthService {
     const { email, password } = payload;
 
     if (!email || !password) {
-      throw new BadRequestException('Invalid Email or Password');
+      throw new BadRequestException("Invalid Email or Password");
     }
 
     const user = await this.userRepository.findOne({
@@ -77,12 +77,12 @@ export class AuthService {
       // },
     });
     if (!user) {
-      throw new NotFoundException('Account is not found');
+      throw new NotFoundException("Account is not found");
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      throw new BadRequestException('Invalid Email or Password');
+      throw new BadRequestException("Invalid Email or Password");
     }
 
     const excludedPasswordUserPayload = {
@@ -90,15 +90,15 @@ export class AuthService {
       password: undefined,
     };
 
-    const secretKey = this.configService.get('JWT_SECRET');
+    const secretKey = this.configService.get("JWT_SECRET");
 
     const access_token = await this.jwtService.signAsync(
       excludedPasswordUserPayload,
-      { secret: secretKey },
+      { secret: secretKey }
     );
 
     return {
-      message: 'Login success',
+      message: "Login success",
       error: null,
       statusCode: HttpStatus.OK,
       data: {
